@@ -18,8 +18,8 @@ import java.util.Objects;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-    ArrayList<String> randomEmojis;
-    String emojiLookUp;
+    ArrayList<String> randomList;
+    String curEmoji;
     long startTime;
 
     @Override
@@ -27,30 +27,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // hide title bar
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        Objects.requireNonNull(getSupportActionBar()).hide();
-//        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        setContentView(R.layout.activity_main);
-
-        initGame();
+        init();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        initGame();
+        init();
     }
 
-    private void initGame()
+    private void init()
     {
         startTime = System.currentTimeMillis();
 
         String[] emojis = getRandomEmojis();
-        randomEmojis = new ArrayList<>(Arrays.asList(emojis));
+        randomList = new ArrayList<>(Arrays.asList(emojis));
 
         setEmojiLookUp();
 
@@ -73,10 +65,10 @@ public class MainActivity extends AppCompatActivity {
         TextView mainItem = findViewById(R.id.mainItem);
 
         Random rand = new Random();
-        int pos = rand.nextInt(randomEmojis.size());
-        emojiLookUp = randomEmojis.get(pos);
+        int pos = rand.nextInt(randomList.size());
+        curEmoji = randomList.get(pos);
 
-        mainItem.setText(emojiLookUp);
+        mainItem.setText(curEmoji);
     }
 
     private AdapterView.OnItemClickListener onPickEmoji()
@@ -84,24 +76,24 @@ public class MainActivity extends AppCompatActivity {
         return (adapterView, view, i, l) -> {
             TextView textView = (TextView) view;
             String pickedEmoji = textView.getText().toString();
-            if (pickedEmoji.equals(emojiLookUp)) {
+            if (pickedEmoji.equals(curEmoji)) {
                 textView.setText("");
-                randomEmojis.remove(pickedEmoji);
+                randomList.remove(pickedEmoji);
 
-                if (randomEmojis.size() == 0) {
-                    startActivityResult(true);
+                if (randomList.size() == 0) {
+                    showActivityResult(true);
                     return;
                 }
 
                 setEmojiLookUp();
             }
             else {
-                startActivityResult(false);
+                showActivityResult(false);
             }
         };
     }
 
-    private void startActivityResult(boolean isWin)
+    private void showActivityResult(boolean isWin)
     {
         Intent intent = new Intent(getApplicationContext(), Result.class);
         intent.putExtra("isWin", isWin);
